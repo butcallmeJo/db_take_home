@@ -9,28 +9,41 @@ access.log.
 import daemon
 import time
 import sys
+import os
 
 def get_info(log_path):
-    print "test info"
+    counter = 0 # counting each second
     while True:
-        # print "test inf loop"
-        with open(log_path, 'r') as log:
-            print "test open log"
-            print log
-            print log.tell()
-        time.sleep(10)
+        try:
+            log = open(log_path, 'r', os.O_NONBLOCK)
+            prev_pos = log.seek(0)
+            while True:
+                # print "before tell"
+                where = log.tell()
+                # print "after tell / before realine"
+                line = log.readline()
+                # print "after readline |%s|" % line
+                if where == prev_pos:
+                    print "break one loop"
+                    break
+                if not line:
+                    time.sleep(0.001) # not good
+                    log.seek(where)
+                else: 
+                    print line,
+                    counter += 1
+                    prev_pos = where
+                    print counter
+        except e:
+            print e
 
 def run_daemon(log_path):
     '''simple function to run the daemon'''
-    print "test run"
-    # out = open('log_averages', 'w+')
     with daemon.DaemonContext(stdout=sys.stdout):
-        # func
-        sys.stdout.write("test run")
         get_info(log_path)
 
 
 if __name__ == "__main__":
-    print "test main"
-    log_path = sys.argv[1]
-    run_daemon(log_path)
+    log_path = "/home/jodag/Dev/personal/db_take_home/access.log" # put the path of the log here
+    # run_daemon(log_path)
+    get_info(log_path)
