@@ -6,10 +6,8 @@ second per status code per route and total from a given log called
 access.log.
 '''
 
-import threading
-import time
-import sys
-import os
+import threading # to coordinate the processing of data separately
+import time 
 import subprocess
 import select
 
@@ -19,15 +17,11 @@ ten_sec_log = []
 # Global variable for organizing the list above
 ten_sec_data = {}
 
-# Counter for test purposes
-# counter = 0
-
 # Format used for randomly generated log lines.
 OUTPUT_FORMAT = "{route}\t{status}\t{qps}"
 
 def get_info(log_path):
     global ten_sec_log
-    global counter
     log = subprocess.Popen(['tail', '-F', log_path], \
         stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     p = select.poll()
@@ -36,7 +30,6 @@ def get_info(log_path):
     while True:
         if p.poll(1):
             ten_sec_log.append(log.stdout.readline(),)
-            # counter += 1
 
 def print_report(ten_sec_log_copy):
     global ten_sec_data
@@ -70,14 +63,12 @@ def parse_log():
         else:
             ten_sec_data[key] = 1
     print_report(ten_sec_log_copy)   
-    # print len(ten_sec_log)
 
 def manage_output():
     global ten_sec_log
     global ten_sec_data
     threading.Timer(10, manage_output).start()
     parse_log()
-    # ten_sec_log = []
     ten_sec_data = {}   
 
 if __name__ == "__main__":
