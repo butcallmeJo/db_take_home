@@ -24,7 +24,7 @@ TEN_SEC_DATA = {}
 OUTPUT_FORMAT = "{route}\t{status}\t{qps}" # qps is query per seconds
 
 # lock for threading
-lock = threading.Lock()
+LOCK = threading.Lock()
 
 def get_info():
     """Get every line from the log."""
@@ -36,7 +36,7 @@ def get_info():
 
     while True:
         if p.poll(1):
-            with lock:
+            with LOCK:
                 TEN_SEC_LOG.append(log.stdout.readline(),)
 
 def print_report(nb_lines):
@@ -60,7 +60,7 @@ def parse_log():
     if not TEN_SEC_LOG:
         return
     # copying TEN_SEC_LOG and clearing it so get_info can use it again.
-    with lock:
+    with LOCK:
         ten_sec_log_copy = TEN_SEC_LOG
         TEN_SEC_LOG = []
     # looping over the copy to get the correct info and save it in a
