@@ -1,0 +1,23 @@
+"Describe some of the pros and cons to using cron and using a daemon."
+
+There are multiple differences between using cron and using a daemon.
+
+Using cron has a couple benefits:
+    - It does not use ressources when the program isn't running.
+    - If the program crashes, it will restart at the next scheduled time.
+There are a couple of cons tho:
+    - It isn't available/running all the time
+        - This makes it harder to be constantly listening to outside input.
+    - Bad tool to use if program needs to run more than once a minute.
+
+Using a daemon has a few benefits as well:
+    - running all the time
+        - permanently available
+    - it can remember the state of previous runs
+        - can make program more efficient
+Cons of using a daemon:
+    - Restarting it is more complex if it quit unexpectedly
+    - Using system ressources all the time
+        - Can lead to memory leaks if not being careful
+
+There are some overlaps where both could be used, but you might want to choose one over the other. For the take home assignment we were told to use a daemon which would be the right choice since we want to be able to access the log in real time as well as providing an output every 10 seconds.

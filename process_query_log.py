@@ -28,13 +28,15 @@ LOCK = threading.Lock()
 def get_info(log_path):
     """Get every line from the log."""
     global TEN_SEC_LOG
+    # Using the tail bash program in a subprocess to get every line
+    # in the log as they are being written.
     log = subprocess.Popen(['tail', '-F', log_path], \
         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p = select.poll()
-    p.register(log.stdout)
+    process = select.poll()
+    process.register(log.stdout)
 
     while True:
-        if p.poll(1):
+        if process.poll(1):
             with LOCK: # protected access
                 TEN_SEC_LOG.append(log.stdout.readline(),)
 
@@ -83,9 +85,9 @@ def manage_output():
 
     # Creating a self timed thread that calls manage_output every 10 secs
     # Making it in daemon mode to exit the program more easily with ctrl+c
-    t = threading.Timer(10, manage_output)
-    t.daemon = True
-    t.start()
+    timer_thread = threading.Timer(10, manage_output)
+    timer_thread.daemon = True
+    timer_thread.start()
     parse_log()
 
 def main(argv):
